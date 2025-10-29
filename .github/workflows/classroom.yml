@@ -1,0 +1,44 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: test_is_strictly_increasing_digits.py
+      id: test_is_strictly_increasing_digits-py
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 5
+        setup-command: pip install pytest
+    - name: test_sum_of_cubes_even.py
+      id: test_sum_of_cubes_even-py
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 5
+        setup-command: pip install pytest
+    - name: test_count_digits_greater_than.py
+      id: test_count_digits_greater_than-py
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 5
+        setup-command: pip install pytest
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST_IS_STRICTLY_INCREASING_DIGITS-PY_RESULTS: "${{steps.test_is_strictly_increasing_digits-py.outputs.result}}"
+        TEST_SUM_OF_CUBES_EVEN-PY_RESULTS: "${{steps.test_sum_of_cubes_even-py.outputs.result}}"
+        TEST_COUNT_DIGITS_GREATER_THAN-PY_RESULTS: "${{steps.test_count_digits_greater_than-py.outputs.result}}"
+      with:
+        runners: test_is_strictly_increasing_digits-py,test_sum_of_cubes_even-py,test_count_digits_greater_than-py
